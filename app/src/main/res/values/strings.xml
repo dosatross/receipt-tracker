@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">receipt-tracker</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="title_activity_camera">Camera</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_expense_detail">ExpenseDetail</string>
+    <string name="title_form">title_form</string>
+    <string name="title_activity_categories">Categories</string>
+    <string name="title_activity_projects">Projects</string>
+    <string name="title_activity_receipt_group_detail">GroupDetail</string>
+    <string name="google_maps_key">AIzaSyDWfyP0BCAxLa2PyXA26I7v90ax9AIs63Q</string>
+</resources>

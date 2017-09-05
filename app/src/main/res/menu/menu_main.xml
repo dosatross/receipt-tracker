@@ -1,0 +1,76 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.hayden.receipt_tracker.MainActivity">
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+
+
+
+    <item
+        android:id="@+id/action_filter"
+        android:orderInCategory="100"
+        android:title="Filter"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_filter_dark">
+
+        <menu>
+            <item
+                android:id="@+id/menuFilterAll"
+                android:title="All" />
+            <item
+                android:id="@+id/menuFilterCategory"
+                android:title="Category" />
+            <item
+                android:id="@+id/menuFilterProject"
+                android:title="Project" />
+            <item
+                android:id="@+id/menuFilterFinYear"
+                android:title="Financial Year" />
+
+        </menu>
+
+
+    </item>
+
+
+
+    <item
+        android:id="@+id/action_sort"
+        android:orderInCategory="100"
+        android:title="Sort"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_sort_dark">
+
+        <menu>
+            <item
+                android:id="@+id/menuSortAmountAsc"
+                android:title="Amount Ascending" />
+            <item
+                android:id="@+id/menuSortAmountDesc"
+                android:title="Amount Descending" />
+
+            <item
+                android:id="@+id/menuSortDateAsc"
+                android:title="Date Ascending" />
+            <item
+                android:id="@+id/menuSortDateDesc"
+                android:title="Date Descending" />
+
+        </menu>
+
+    </item>
+
+
+    <item
+        android:id="@+id/action_search"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_search_dark"
+        app:showAsAction="collapseActionView|always"
+        app:actionViewClass="android.widget.SearchView"
+        android:title="Search" />
+
+</menu>
