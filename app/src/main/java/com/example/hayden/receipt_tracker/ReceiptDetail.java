@@ -1,10 +1,15 @@
 package com.example.hayden.receipt_tracker;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -21,6 +26,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class ReceiptDetail extends AppCompatActivity implements OnMapReadyCallback {
 
     private DBHandler dbHandler;
+    private ImageView photoView;
     private TextView desc;
     private TextView amount;
     private TextView date;
@@ -39,6 +45,7 @@ public class ReceiptDetail extends AppCompatActivity implements OnMapReadyCallba
 
         dbHandler = DBHandler.getInstance(this);
 
+        photoView =  (ImageView) findViewById(R.id.photo);
         desc = (TextView) findViewById(R.id.desc);
         amount = (TextView) findViewById(R.id.amount);
         date = (TextView) findViewById(R.id.date);
@@ -51,6 +58,17 @@ public class ReceiptDetail extends AppCompatActivity implements OnMapReadyCallba
         id = intent.getIntExtra("receipt-id",0);
         Receipt receipt = dbHandler.getReceiptById(id);
 
+
+        Bitmap photo = BitmapFactory.decodeFile(receipt.get_photo());
+
+        int height = photo.getHeight();
+        int width = photo.getWidth();
+        float aspectRatio = (float)height/width;
+        int scaledWidth = 500;
+        int scaledHeight = (int)(aspectRatio*scaledWidth);
+
+
+        photoView.setImageBitmap(Bitmap.createScaledBitmap(photo,scaledWidth,scaledHeight,false));
         desc.setText(receipt.get_desc());
         amount.setText(String.valueOf(receipt.get_amount()));
         date.setText(receipt.get_date());
@@ -81,6 +99,10 @@ public class ReceiptDetail extends AppCompatActivity implements OnMapReadyCallba
     public void onDeleteButtonClicked(View view)
     {
         dbHandler.deleteReceipt(id);
+        Intent resultIntent = new Intent();
+
+        resultIntent.putExtra("refresh", true);
+        setResult(Activity.RESULT_OK, resultIntent);
         finish();
     }
 

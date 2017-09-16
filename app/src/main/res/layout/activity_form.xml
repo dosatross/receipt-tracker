@@ -15,9 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="15dp"
-            android:layout_marginTop="15dp"
-            android:minHeight="250dp"
-            android:minWidth="250dp" />
+            android:layout_marginTop="15dp" />
 
         <Spinner
             android:id="@+id/projectInput"
@@ -37,8 +35,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Desc" />
+            android:hint="Description"
+            android:inputType="textPersonName" />
 
         <EditText
             android:id="@+id/amountInput"
@@ -46,8 +44,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:ems="10"
-            android:inputType="number"
-            android:text="1" />
+            android:hint="Amount"
+            android:inputType="number" />
 
         <LinearLayout
             android:layout_width="wrap_content"

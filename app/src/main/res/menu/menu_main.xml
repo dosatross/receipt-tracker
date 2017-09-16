@@ -19,8 +19,8 @@
 
         <menu>
             <item
-                android:id="@+id/menuFilterAll"
-                android:title="All" />
+                android:id="@+id/menuFilterReceipts"
+                android:title="Receipts" />
             <item
                 android:id="@+id/menuFilterCategory"
                 android:title="Category" />

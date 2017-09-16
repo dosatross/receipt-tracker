@@ -45,8 +45,8 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String COLUMN_CID = "_cid";
     private static final String COLUMN_CNAME = "_name";
 
-    private static final String[] PRESET_CATEGORIES = {"Category 1", "Category 2", "Category 3"};
-    private static final String[] PRESET_PROJECTS = {"Project 1", "Project 2", "Project 3"};
+    private static final String[] PRESET_CATEGORIES = {"Petrol", "Durable Tooling", "Perishable Equipment", "Sub-contracting", "Travel", "Work Clothing", "Training", "Machine Repairs", "Utilities", "Equipment", "Phone", "Union Fees"};
+    private static final String[] PRESET_PROJECTS = {"PRM Elevator Installation", "Rand Escalator Repair", "Decommision PRM Elevator"};
 
     private DBHandler(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, DATABASE_NAME, factory, DATABASE_VERSION);
