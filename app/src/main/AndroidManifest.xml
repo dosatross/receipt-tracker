@@ -6,13 +6,16 @@
         android:name="android.hardware.camera"
         android:required="true" />
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:required="true" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:required="true" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:required="true" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
+        android:required="true"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"
+        android:required="true"/>
+
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
@@ -62,15 +65,15 @@
                 android:resource="@xml/searchable" />
         </activity>
         <activity
-            android:name=".Form"
+            android:name=".FormActivity"
             android:label="@string/title_form"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ReceiptGroupDetail"
+            android:name=".ReceiptGroupDetailActivity"
             android:label="@string/title_activity_receipt_group_detail"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <activity android:name=".ReceiptDetail">
+        <activity android:name=".ReceiptDetailActivity">
 
 
         </activity>

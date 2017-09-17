@@ -14,15 +14,16 @@ import android.widget.TextView;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class ReceiptDetail extends AppCompatActivity implements OnMapReadyCallback {
+public class ReceiptDetailActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    private static final String DOLLAR_SIGN = "$";
+    private static final int ZOOM = 12;
+    private static final int SCALED_WIDTH = 500;
 
     private DBHandler dbHandler;
     private ImageView photoView;
@@ -55,6 +56,29 @@ public class ReceiptDetail extends AppCompatActivity implements OnMapReadyCallba
 
         Intent intent = getIntent();
         id = intent.getIntExtra("receipt-id",0);
+
+        populateGuiElements();
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap)
+    {
+        //render map
+        MarkerOptions markerOptions = new MarkerOptions().position(coordinates).title((String) desc.getText());
+        googleMap.addMarker(markerOptions);
+        CameraUpdate center = CameraUpdateFactory.newLatLng(coordinates);
+        CameraUpdate zoom=CameraUpdateFactory.zoomTo(ZOOM);
+        googleMap.moveCamera(center);
+        googleMap.animateCamera(zoom);
+    }
+
+    protected void populateGuiElements()
+    {
         Receipt receipt = dbHandler.getReceiptById(id);
 
 
@@ -63,39 +87,23 @@ public class ReceiptDetail extends AppCompatActivity implements OnMapReadyCallba
         int height = photo.getHeight();
         int width = photo.getWidth();
         float aspectRatio = (float)height/width;
-        int scaledWidth = 500;
+        int scaledWidth = SCALED_WIDTH;
         int scaledHeight = (int)(aspectRatio*scaledWidth);
 
 
         photoView.setImageBitmap(Bitmap.createScaledBitmap(photo,scaledWidth,scaledHeight,false));
         desc.setText(receipt.get_desc());
-        amount.setText("$" + String.valueOf(receipt.get_amount()));
+        String amountStr = DOLLAR_SIGN + String.valueOf(receipt.get_amount());
+        amount.setText(amountStr);
         date.setText(receipt.get_date());
         category.setText(receipt.get_category());
         project.setText(receipt.get_project());
         reimburse.setChecked(receipt.is_reimburse());
         tax.setChecked(receipt.is_tax());
         coordinates = new LatLng(receipt.get_xcoord(),receipt.get_ycoord());
-
-
-
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        googleMap.addMarker(new MarkerOptions().position(coordinates).title("Receipt Location"));
-        CameraUpdate center = CameraUpdateFactory.newLatLng(coordinates);
-        CameraUpdate zoom=CameraUpdateFactory.zoomTo(12);
-        googleMap.moveCamera(center);
-        googleMap.animateCamera(zoom);
-    }
-
-    public void onDeleteButtonClicked(View view)
+    protected void onDeleteButtonClicked(View view)
     {
         dbHandler.deleteReceipt(id);
         Intent resultIntent = new Intent();

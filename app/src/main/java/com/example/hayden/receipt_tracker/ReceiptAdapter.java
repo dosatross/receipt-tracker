@@ -1,8 +1,6 @@
 package com.example.hayden.receipt_tracker;
 
 import android.content.Context;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +10,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 
-
 public class ReceiptAdapter extends ArrayAdapter<Receipt> {
-
 
     //View lookup cache
     private static class ViewHolder {
@@ -22,9 +18,7 @@ public class ReceiptAdapter extends ArrayAdapter<Receipt> {
         TextView category;
         TextView amount;
         TextView date;
-
     }
-
 
     public ReceiptAdapter(Context context, ArrayList<Receipt> receipts) {
         super(context, 0, receipts);

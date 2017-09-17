@@ -1,6 +1,6 @@
 package com.example.hayden.receipt_tracker;
 
-
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,7 +9,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -21,11 +20,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReceiptGroupDetail extends AppCompatActivity implements OnMapReadyCallback {
+public class ReceiptGroupDetailActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    private static final float PADDING_MULTIPLIER = (float) 0.20;
+
     private DBHandler dbHandler;
     private String group;
     private String groupInstance;
-    private TextView textView;
+    private TextView title;
     private ArrayList<Receipt> receipts;
     private LatLng coordinates;
 
@@ -36,13 +38,14 @@ public class ReceiptGroupDetail extends AppCompatActivity implements OnMapReadyC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receipt_group_detail);
 
-        textView = (TextView) findViewById(R.id.textView);
+        title = (TextView) findViewById(R.id.title);
         listView = (ListView)  findViewById(R.id.listView);
+
 
         dbHandler = DBHandler.getInstance(this);
 
         parseIntent();
-        textView.setText(groupInstance);
+        title.setText(groupInstance);
         viewReceiptList();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -52,14 +55,12 @@ public class ReceiptGroupDetail extends AppCompatActivity implements OnMapReadyC
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(),ReceiptDetail.class);
+                Intent intent = new Intent(getApplicationContext(),ReceiptDetailActivity.class);
                 Receipt receipt = (Receipt) parent.getItemAtPosition(position);
                 intent.putExtra("receipt-id",receipt.get_id());
                 startActivity(intent);
             }
         });
-
-
     }
 
     @Override
@@ -86,12 +87,12 @@ public class ReceiptGroupDetail extends AppCompatActivity implements OnMapReadyC
 
         final int zoomWidth = getResources().getDisplayMetrics().widthPixels;
         final int zoomHeight = getResources().getDisplayMetrics().heightPixels;
-        final int zoomPadding = (int) (zoomWidth * 0.20);
+        final int zoomPadding = (int) (zoomWidth * PADDING_MULTIPLIER);
 
         googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, zoomWidth, zoomHeight, zoomPadding));
     }
 
-    public void viewReceiptList()
+    protected void viewReceiptList()
     {
         if(group.equals("category"))
         {
@@ -109,7 +110,7 @@ public class ReceiptGroupDetail extends AppCompatActivity implements OnMapReadyC
         listView.setAdapter(adapter);
     }
 
-    public void parseIntent()
+    protected void parseIntent()
     {
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
@@ -126,5 +127,28 @@ public class ReceiptGroupDetail extends AppCompatActivity implements OnMapReadyC
         {
             groupInstance = extras.getString("finyear");
         }
+    }
+
+    protected void onDeleteButtonClicked(View view)
+    {
+        for(int i = 0; i < receipts.size();i++)
+        {
+            dbHandler.deleteReceipt(receipts.get(i).get_id());
+        }
+
+        if(group.equals("category"))
+        {
+            dbHandler.deleteCategory(groupInstance);
+        }
+        else if (group.equals("project"))
+        {
+            dbHandler.deleteProject(groupInstance);
+        }
+
+        Intent resultIntent = new Intent();
+
+        resultIntent.putExtra("refresh", true);
+        setResult(Activity.RESULT_OK, resultIntent);
+        finish();
     }
 }

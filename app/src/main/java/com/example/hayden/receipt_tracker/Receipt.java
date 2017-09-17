@@ -49,7 +49,8 @@ public class Receipt {
         };
     }
 
-    static Comparator<Receipt> getAmountComparator() {
+    //Comparable for sorting
+    public static Comparator<Receipt> getAmountComparator() {
         return new Comparator<Receipt>() {
             public int compare(Receipt one, Receipt two) {
 
