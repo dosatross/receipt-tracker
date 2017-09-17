@@ -1,7 +1,6 @@
 package com.example.hayden.receipt_tracker;
 
 
-import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +8,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -31,7 +29,6 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -41,48 +38,45 @@ import java.util.Collections;
 import java.util.Date;
 
 
-
-
 /*
 * TODO
 * Features:
 * - Internal camera
-*
+* - settings page: reset database to
 *
 * Implement:
-* - location listener so that location doesnt have null
-* - clean up and styalise gui / item layout
-* - on details page: tags modify db entry
 * - category and project spinner first value
-* - make location current location not last known location
-* - form required
 * - handle if user denies permission
+* - delete category/project
 *
 *
 * Possible changes:
 * - JOIN for category/project?
 * - new tables: settings and finyear?
 * - manual enter of location if they enter receipt away from store location
+* - max words description
 *
 * Bugs:
 * - crashes when searching on category list
+* - crashes when delete all receipts from a project then view the project
 *
 * Clean Up:
-* - remove preset projects
-* - remove receipt entries
 * - refactor (ESPECIALLY DBHandler)
 * - search for TODOs
+* - call activity classes activity
+* - order receipts by date by default
 *
 * */
 
 public class MainActivity extends AppCompatActivity{
 
+
     private static final String PHOTO_SUFFIX = ".jpg";
 
+    //permissions
     private static final int ACTION_IMAGE_CAPTURE = 2;
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 102;
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 103;
-
     private static final int INTENT_REQUEST_CODE = 1;//TODO rename this
 
     private DBHandler dbHandler;
@@ -103,6 +97,16 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED)
+        {
+            askForPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+        }
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED)
+        {
+            askForPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+        }
+
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         listView = (ListView)  findViewById(R.id.listViewMain);
         editText = (EditText)  findViewById(R.id.editText);
@@ -112,7 +116,6 @@ public class MainActivity extends AppCompatActivity{
 
         dbHandler = DBHandler.getInstance(this);
 
-        //set up preset categories
         SharedPreferences wmbPreference = PreferenceManager.getDefaultSharedPreferences(this);
         boolean isFirstRun = wmbPreference.getBoolean("FIRSTRUN", true);
         dbHandler.resetDatabase(); isFirstRun = true; //reset system
@@ -121,34 +124,7 @@ public class MainActivity extends AppCompatActivity{
 
         if (isFirstRun)
         {
-            dbHandler.addPresetCategories();
-            dbHandler.addPresetProjects();
-
-            saveDrawableReceipt(R.drawable.receipt_1);
-            Receipt receipt1 = new Receipt(photoUrl,"Project 1","Category 1","2017-06-01",(float)50.0,"Receipt 1",(float)-37.867470,(float)145.101451,false,false);
-            saveDrawableReceipt(R.drawable.receipt_2);
-            Receipt receipt2 = new Receipt(photoUrl,"Project 3","Category 2","2017-07-01",(float)90.0,"Receipt 2",(float)-37.865742,(float)145.101354,true,false);
-            saveDrawableReceipt(R.drawable.receipt_3);
-            Receipt receipt3 = new Receipt(photoUrl,"Project 2","Category 1","2017-04-01",(float)430.0,"Receipt 3",(float)-37.807495,(float)144.981010,false,false);
-            saveDrawableReceipt(R.drawable.receipt_4);
-            Receipt receipt4 = new Receipt(photoUrl,"Project 1","Category 3","2016-02-01",(float)20.0,"Receipt 4",(float)-37.819032,(float)144.953472,true,true);
-            saveDrawableReceipt(R.drawable.receipt_5);
-            Receipt receipt5 = new Receipt(photoUrl,"Project 1","Category 1","2014-06-01",(float)250.0,"Receipt 5",(float)-37.860070,(float)145.101051,false,false);
-            saveDrawableReceipt(R.drawable.receipt_6);
-            Receipt receipt6 = new Receipt(photoUrl,"Project 3","Category 2","2017-07-03",(float)190.0,"Receipt 6",(float)-37.865742,(float)145.101954,true,false);
-            saveDrawableReceipt(R.drawable.receipt_7);
-            Receipt receipt7 = new Receipt(photoUrl,"Project 2","Category 1","2012-04-01",(float)340.0,"Receipt 7",(float)-37.803495,(float)144.984810,false,false);
-            saveDrawableReceipt(R.drawable.receipt_8);
-            Receipt receipt8 = new Receipt(photoUrl,"Project 1","Category 3","2016-02-01",(float)205.0,"Receipt 8",(float)-37.813032,(float)144.955472,true,true);
-            dbHandler.addReceipt(receipt1);
-            dbHandler.addReceipt(receipt2);
-            dbHandler.addReceipt(receipt3);
-            dbHandler.addReceipt(receipt4);
-            dbHandler.addReceipt(receipt5);
-            dbHandler.addReceipt(receipt6);
-            dbHandler.addReceipt(receipt7);
-            dbHandler.addReceipt(receipt8);
-
+            populateDatabase();
             SharedPreferences.Editor editor = wmbPreference.edit();
             editor.putBoolean("FIRSTRUN", false);
             editor.apply();
@@ -224,12 +200,6 @@ public class MainActivity extends AppCompatActivity{
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d("","");
     }
 
 
@@ -369,14 +339,6 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void dispatchTakePictureIntent(View view) {
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED)
-        {
-            askForPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-        }
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED)
-        {
-            askForPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-        }
 
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -503,6 +465,38 @@ public class MainActivity extends AppCompatActivity{
     {
         Collections.sort(receipts, Collections.<Receipt>reverseOrder(Receipt.getDateComparator()));
         refreshReceiptList();
+    }
+
+
+    public void populateDatabase()
+    {
+        dbHandler.addPresetCategories();
+        dbHandler.addPresetProjects();
+
+        saveDrawableReceipt(R.drawable.receipt_1);
+        Receipt receipt1 = new Receipt(photoUrl,"PRM Elevator Installation","Durable Tooling","2017-06-01",(float)365.0,"2pc Cordless Drill Kit",(float)-37.867470,(float)145.101451,true,false);
+        saveDrawableReceipt(R.drawable.receipt_2);
+        Receipt receipt2 = new Receipt(photoUrl,"PRM Elevator Installation","Durable Tooling","2017-07-01",(float)60.0,"Vernier Caliper 150mm",(float)-37.865742,(float)145.101354,true,false);
+        saveDrawableReceipt(R.drawable.receipt_3);
+        Receipt receipt3 = new Receipt(photoUrl,"PRM Elevator Installation","Durable Tooling","2017-04-01",(float)100.0,"Platform Trolley",(float)-37.885580,(float)144.998978,false,false);
+        saveDrawableReceipt(R.drawable.receipt_4);
+        Receipt receipt4 = new Receipt(photoUrl,"PRM Elevator Installation","Durable Tooling","2016-02-01",(float)120.0,"Cordless Palm Orbital Sander",(float)-37.885580,(float)144.998978,true,false);
+        saveDrawableReceipt(R.drawable.receipt_5);
+        Receipt receipt5 = new Receipt(photoUrl,"PRM Elevator Installation","Perishable Equipment","2014-06-01",(float)250.0,"10G x 50mm Stainless Steel Screws",(float)-37.809253,(float)144.989702,false,false);
+        saveDrawableReceipt(R.drawable.receipt_6);
+        Receipt receipt6 = new Receipt(photoUrl,"Decommision PRM Elevator","Petrol","2017-07-03",(float)43.0,"Petrol",(float)-37.865742,(float)145.101954,true,false);
+        saveDrawableReceipt(R.drawable.receipt_7);
+        Receipt receipt7 = new Receipt(photoUrl,"Rand Escalator Repair","Sub-contracting","2012-04-01",(float)550.0,"Myer's Repair",(float)-37.803495,(float)144.984810,false,false);
+        saveDrawableReceipt(R.drawable.receipt_8);
+        Receipt receipt8 = new Receipt(photoUrl,"Decommision PRM Elevator","Work Clothing","2016-02-01",(float)37.0,"Visibility Jacket",(float)-37.813032,(float)144.955472,true,true);
+        dbHandler.addReceipt(receipt1);
+        dbHandler.addReceipt(receipt2);
+        dbHandler.addReceipt(receipt3);
+        dbHandler.addReceipt(receipt4);
+        dbHandler.addReceipt(receipt5);
+        dbHandler.addReceipt(receipt6);
+        dbHandler.addReceipt(receipt7);
+        dbHandler.addReceipt(receipt8);
     }
 
 

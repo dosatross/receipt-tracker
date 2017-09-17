@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -70,7 +69,7 @@ public class ReceiptDetail extends AppCompatActivity implements OnMapReadyCallba
 
         photoView.setImageBitmap(Bitmap.createScaledBitmap(photo,scaledWidth,scaledHeight,false));
         desc.setText(receipt.get_desc());
-        amount.setText(String.valueOf(receipt.get_amount()));
+        amount.setText("$" + String.valueOf(receipt.get_amount()));
         date.setText(receipt.get_date());
         category.setText(receipt.get_category());
         project.setText(receipt.get_project());
@@ -106,5 +105,14 @@ public class ReceiptDetail extends AppCompatActivity implements OnMapReadyCallba
         finish();
     }
 
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        dbHandler.updateColumnTax(id,tax.isChecked());
+        dbHandler.updateColumnReimburse(id,reimburse.isChecked());
+
+    }
 
 }

@@ -21,6 +21,7 @@ public class ReceiptAdapter extends ArrayAdapter<Receipt> {
         TextView desc;
         TextView category;
         TextView amount;
+        TextView date;
 
     }
 
@@ -41,6 +42,7 @@ public class ReceiptAdapter extends ArrayAdapter<Receipt> {
             viewHolder.desc = (TextView) convertView.findViewById(R.id.desc);
             viewHolder.category = (TextView) convertView.findViewById(R.id.category);
             viewHolder.amount = (TextView) convertView.findViewById(R.id.amount);
+            viewHolder.date = (TextView) convertView.findViewById(R.id.date);
             // Cache the viewHolder object inside the fresh view
             convertView.setTag(viewHolder);
 
@@ -53,6 +55,7 @@ public class ReceiptAdapter extends ArrayAdapter<Receipt> {
         viewHolder.desc.setText(receipt.get_desc());
         viewHolder.category.setText(receipt.get_category());
         viewHolder.amount.setText(String.valueOf(receipt.get_amount()));
+        viewHolder.date.setText(String.valueOf(receipt.get_date()));
 
         // Return the completed view to render on screen
         return convertView;

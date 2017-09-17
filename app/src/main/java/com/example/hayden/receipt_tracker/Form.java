@@ -3,6 +3,7 @@ package com.example.hayden.receipt_tracker;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -55,11 +56,13 @@ public class Form extends AppCompatActivity {
 
     //GPS
     private LocationManager locationManager;
+    private LocationListener locationListener;
     private String provider;
     private static final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 100;
     private static final int MY_PERMISSIONS_REQUEST_COARSE_LOCATION = 101;
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 102;
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 103;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +124,21 @@ public class Form extends AppCompatActivity {
         projectInput.setAdapter(projectsSpinnerArrayAdapter);
 
         //GPS
+        locationListener=new LocationListener() {
+            @Override
+            public void onLocationChanged(android.location.Location location) {}
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
+            @Override
+            public void onProviderEnabled(String provider) {}
+            @Override
+            public void onProviderDisabled(String provider) {}
+        };
+
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
+
+
         Criteria criteria = new Criteria();
         provider = locationManager.getBestProvider(criteria, false);
 
@@ -217,7 +234,7 @@ public class Form extends AppCompatActivity {
         }
 
         //Location
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             askForPermission(Manifest.permission.ACCESS_FINE_LOCATION, MY_PERMISSIONS_REQUEST_FINE_LOCATION);
             askForPermission(Manifest.permission.ACCESS_COARSE_LOCATION, MY_PERMISSIONS_REQUEST_COARSE_LOCATION);
         }

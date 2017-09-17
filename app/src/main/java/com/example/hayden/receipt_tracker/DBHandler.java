@@ -114,6 +114,21 @@ public class DBHandler extends SQLiteOpenHelper {
         }
     }
 
+    public void updateColumnTax(int id,boolean value)
+    {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_TAX,value);
+        db.update(TABLE_RECEIPT, values, COLUMN_RID + "=" + id, null);
+    }
+    public void updateColumnReimburse(int id,boolean value)
+    {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_REIMBURSE,value);
+        db.update(TABLE_RECEIPT, values, COLUMN_RID + "=" + id, null);
+    }
+
 
     public void addReceipt(Receipt receipt) {
         ContentValues values = new ContentValues();
